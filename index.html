@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>YukiNav</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E2792B">
+<meta name="description" content="スキー・スノボのゲレンデ選びを3問で診断するアプリ">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YukiNav">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EEF1F4;
+  --surface:#FFFFFF;
+  --surface-2:#F7F9FB;
+  --text:#1C2430;
+  --text-muted:#5B6672;
+  --border:#D7DEE5;
+  --accent:#E2792B;
+  --accent-ink:#7A3C10;
+  --accent-soft:#FBE4CC;
+  --good:#2F8F5B;
+  --good-soft:#DCF0E6;
+  --cold:#2E6B8A;
+  --cold-soft:#DCEAF1;
+  --font-display:'Oswald',sans-serif;
+  --font-body:'Work Sans',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#121820; --surface:#1B232D; --surface-2:#212B36; --text:#EDEFF2; --text-muted:#9AA7B4;
+    --border:#2C3844; --accent:#F0924A; --accent-ink:#2A1204; --accent-soft:#3A2412;
+    --good:#4FBF86; --good-soft:#1C3A2B; --cold:#5FA8CC; --cold-soft:#1C3340;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121820; --surface:#1B232D; --surface-2:#212B36; --text:#EDEFF2; --text-muted:#9AA7B4;
+  --border:#2C3844; --accent:#F0924A; --accent-ink:#2A1204; --accent-soft:#3A2412;
+  --good:#4FBF86; --good-soft:#1C3A2B; --cold:#5FA8CC; --cold-soft:#1C3340;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.5;}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;}
+.num{font-variant-numeric:tabular-nums;}
+.ic-svg{display:inline-block;vertical-align:-4px;flex:0 0 auto;}
+button{font-family:inherit;}
+a{color:inherit;}
+
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--border);}
+.header-inner{display:flex;align-items:center;gap:16px;padding-block:14px;flex-wrap:wrap;}
+.brand{display:flex;align-items:baseline;gap:10px;flex:1 1 auto;min-width:0;}
+.brand h1{font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--text);}
+.brand .tagline{font-size:12.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.beta-pill{font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:3px 9px;flex:0 0 auto;}
+.lang-toggle{display:flex;border:1px solid var(--border);border-radius:999px;overflow:hidden;flex:0 0 auto;}
+.lang-toggle button{border:none;background:var(--surface);color:var(--text-muted);font-size:12.5px;font-weight:600;padding:7px 14px;cursor:pointer;}
+.lang-toggle button.active{background:var(--accent);color:#fff;}
+
+/* bottom tab bar (native-app style) */
+.bottom-nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:var(--surface);border-top:1px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bottom-nav-inner{
+  max-width:1080px;margin:0 auto;display:flex;
+}
+.nav-btn{
+  flex:1 1 0;border:none;background:transparent;color:var(--text-muted);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 4px 10px;cursor:pointer;font-size:10.5px;font-weight:600;
+}
+.nav-btn .nav-ic{display:flex;line-height:1;}
+.nav-btn .nav-ic .ic-svg{vertical-align:0;}
+.nav-btn.active{color:var(--accent);}
+body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));}
+
+.search-row{padding-block:14px 14px;display:flex;gap:10px;flex-wrap:wrap;}
+.search-box{flex:1 1 220px;position:relative;}
+.search-box input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:14px;}
+.search-box input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+select{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:13.5px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;user-select:none;white-space:nowrap;}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);}
+.chip input{display:none;}
+
+main{padding-block:18px 24px;}
+.view-title{font-size:20px;margin-bottom:4px;}
+.view-sub{color:var(--text-muted);font-size:13px;margin-bottom:16px;}
+.result-count{color:var(--text-muted);font-size:13px;margin-bottom:12px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;font-family:inherit;color:inherit;}
+.card:hover{border-color:var(--accent);}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.card h3{font-size:18px;line-height:1.25;}
+.region-tag{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.weather-chip{flex:0 0 auto;display:flex;align-items:center;gap:4px;font-size:12.5px;background:var(--cold-soft);color:var(--cold);border-radius:999px;padding:4px 9px;}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--text-muted);}
+.meta-row .dot{opacity:0.6;}
+.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.price{font-family:var(--font-display);font-size:17px;}
+.price .unit{font-family:var(--font-body);font-size:11.5px;color:var(--text-muted);font-weight:500;}
+.badge{font-size:11px;font-weight:600;border-radius:7px;padding:3px 7px;}
+.badge.student{background:var(--good-soft);color:var(--good);}
+
+/* wizard */
+.wizard-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:18px;}
+.wizard-intro{color:var(--text-muted);font-size:13.5px;margin-bottom:18px;}
+.q-block{margin-bottom:20px;}
+.q-label{font-size:14.5px;font-weight:600;margin-bottom:10px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;}
+.pill.sel{background:var(--accent);border-color:var(--accent);color:#fff;}
+.wizard-submit{width:100%;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;border-radius:12px;padding:14px;cursor:pointer;margin-top:4px;}
+.wizard-submit:disabled{opacity:0.4;cursor:not-allowed;}
+
+.reco-card{background:var(--surface);border:2px solid var(--accent);border-radius:18px;padding:22px;margin-bottom:16px;}
+.reco-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);display:inline-block;border-radius:999px;padding:4px 11px;margin-bottom:10px;}
+.reco-card h2{font-size:26px;margin-bottom:4px;}
+.reco-sub{color:var(--text-muted);font-size:13px;margin-bottom:16px;}
+.reco-approx-note{background:var(--accent-soft);color:var(--accent-ink);border-radius:10px;padding:9px 12px;font-size:12px;margin-bottom:14px;}
+.reco-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.reco-row{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border-radius:12px;padding:11px 13px;}
+.reco-row .ic{font-size:18px;flex:0 0 auto;}
+.reco-row .rt{font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:2px;}
+.reco-row .rv{font-size:13.5px;}
+.packing-list{display:flex;flex-wrap:wrap;gap:6px;}
+.packing-item{background:var(--cold-soft);color:var(--cold);border-radius:999px;padding:4px 10px;font-size:12px;}
+.reco-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+.reco-secondary-btn{flex:1 1 auto;border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:10px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;}
+.reco-detail-btn{flex:1 1 auto;border:none;background:var(--accent);color:#fff;border-radius:10px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;}
+
+/* weather tab */
+.weather-grid{display:flex;flex-direction:column;gap:10px;}
+.weather-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;font-family:inherit;color:inherit;width:100%;}
+.weather-card:hover{border-color:var(--accent);}
+.weather-ic{font-size:28px;flex:0 0 auto;width:40px;text-align:center;}
+.weather-main{flex:1;min-width:0;}
+.weather-main h3{font-size:16px;}
+.live-badge{font-size:9.5px;font-weight:700;letter-spacing:0.05em;color:var(--good);background:var(--good-soft);border-radius:999px;padding:2px 6px;vertical-align:middle;}
+.weather-main .wsub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.weather-temp{font-family:var(--font-display);font-size:22px;flex:0 0 auto;text-align:right;}
+.weather-temp .wd{font-family:var(--font-body);font-size:11px;color:var(--text-muted);font-weight:500;}
+
+/* map tab */
+.map-wrap{position:relative;width:100%;max-width:340px;margin:0 auto;aspect-ratio:320/560;background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;}
+.map-svg{position:absolute;inset:0;width:100%;height:100%;}
+.map-svg ellipse,.map-svg circle{fill:var(--surface-2);stroke:var(--border);stroke-width:1.5;}
+.map-svg line{stroke:var(--border);stroke-width:1.2;}
+.map-pins{position:absolute;inset:0;}
+.map-pin{
+  position:absolute;transform:translate(-50%,-100%);border:none;background:transparent;cursor:pointer;
+  padding:0;line-height:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+}
+.map-pin .pin-dot{
+  width:16px;height:16px;border-radius:50% 50% 50% 0;background:var(--accent);transform:rotate(45deg);
+  display:block;border:2px solid var(--surface);
+}
+.map-pin.sel .pin-dot{background:#D93025;}
+.map-legend{text-align:center;font-size:11.5px;color:var(--text-muted);margin-top:10px;}
+.map-active-card{margin-top:16px;}
+
+/* gear tab */
+.gear-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.gear-tab-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.gear-tab-btn.sel{background:var(--accent);border-color:var(--accent);color:#fff;}
+.gear-tab-btn .dot-missing{width:6px;height:6px;border-radius:50%;background:var(--text-muted);opacity:0.5;}
+.gear-product-card{background:var(--surface);border:2px solid var(--accent);border-radius:18px;padding:24px;text-align:center;}
+.gear-product-ic{font-size:44px;margin-bottom:10px;}
+.gear-product-name{font-size:18px;font-weight:700;margin-bottom:6px;}
+.gear-product-tag{font-size:11.5px;font-weight:600;color:var(--good);background:var(--good-soft);border-radius:999px;padding:3px 10px;display:inline-block;margin-bottom:14px;}
+.gear-product-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;text-decoration:none;font-size:14px;font-weight:700;border-radius:10px;padding:12px 20px;}
+.gear-empty-card{background:var(--surface-2);border:1px dashed var(--border);border-radius:18px;padding:28px;text-align:center;color:var(--text-muted);font-size:13.5px;}
+
+/* detail overlay */
+.overlay{position:fixed;inset:0;background:rgba(10,14,18,0.5);display:flex;justify-content:center;align-items:flex-end;z-index:50;padding-top:env(safe-area-inset-top,0px);}
+.overlay[hidden]{display:none;}
+.sheet{width:100%;max-width:720px;max-height:92vh;overflow-y:auto;background:var(--surface);border-radius:20px 20px 0 0;padding:22px 22px calc(28px + env(safe-area-inset-bottom,0px));}
+@media (min-width:760px){.overlay{align-items:center;padding-top:0;} .sheet{border-radius:18px;max-height:88vh;margin-block:20px;}}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:4px;}
+.sheet-head h2{font-size:26px;}
+.close-btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);border-radius:10px;width:34px;height:34px;font-size:16px;cursor:pointer;flex:0 0 auto;}
+.sheet-sub{color:var(--text-muted);font-size:13px;margin-bottom:18px;}
+.section-label{font-size:11.5px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+.info-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.info-card{background:var(--surface-2);border-radius:12px;padding:12px;}
+.info-card .big{font-family:var(--font-display);font-size:19px;}
+.info-card .label{font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+.terrain-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;margin-bottom:8px;}
+.terrain-legend{display:flex;gap:14px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;margin-bottom:20px;}
+.terrain-legend span{display:inline-flex;align-items:center;gap:5px;}
+.swatch{width:9px;height:9px;border-radius:3px;display:inline-block;}
+.cta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px;}
+.cta-card{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:8px;}
+.cta-card .cta-title{font-size:13.5px;font-weight:600;}
+.cta-card .cta-desc{font-size:12px;color:var(--text-muted);flex:1;}
+.cta-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;background:var(--accent);color:#fff;text-decoration:none;font-size:12.5px;font-weight:600;border-radius:8px;padding:8px 10px;}
+.cta-btn:hover{opacity:0.9;}
+.disclaimer{font-size:11.5px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:14px;margin-top:6px;}
+.empty{padding-block:40px;text-align:center;color:var(--text-muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="brand">
+      <h1>YukiNav</h1>
+      <span class="tagline" data-t="tagline"></span>
+    </div>
+    <span class="beta-pill" data-t="betaPill"></span>
+    <div class="lang-toggle" role="group" aria-label="language">
+      <button id="btnJa" class="active">日本語</button>
+      <button id="btnEn">EN</button>
+    </div>
+  </div>
+  <div class="wrap search-row" id="searchRow" hidden>
+    <div class="search-box">
+      <input id="searchInput" type="search" data-t-placeholder="searchPlaceholder">
+    </div>
+    <select id="regionSelect"></select>
+    <label class="chip" id="chipStudent"><input type="checkbox"><svg class="ic-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-4 10 4-10 4z"/><path d="M6 11v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4"/></svg> <span data-t="chipStudent"></span></label>
+    <label class="chip" id="chipEnglish"><input type="checkbox"><svg class="ic-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg> <span data-t="chipEnglish"></span></label>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div id="wizardView">
+      <div class="wizard-card" id="wizardQuiz">
+        <div class="wizard-intro" data-t="wizardIntro"></div>
+        <div class="q-block">
+          <div class="q-label" data-t="qFromBlock"></div>
+          <div class="pill-row" id="pillBlock"></div>
+        </div>
+        <div class="q-block" id="prefBlockWrap" hidden>
+          <div class="q-label" data-t="qFromPref"></div>
+          <div class="pill-row" id="pillPref"></div>
+        </div>
+        <div class="q-block">
+          <div class="q-label" data-t="qTrip"></div>
+          <div class="pill-row" id="pillTrip"></div>
+        </div>
+        <div class="q-block">
+          <div class="q-label" data-t="qLevel"></div>
+          <div class="pill-row" id="pillLevel"></div>
+        </div>
+        <button class="wizard-submit" id="wizardSubmit" disabled data-t="wizardSubmit"></button>
+      </div>
+      <div id="wizardResult" hidden></div>
+    </div>
+
+    <div id="nearbyView" hidden>
+      <div class="result-count" id="resultCount"></div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="emptyState" hidden></div>
+    </div>
+
+    <div id="weatherView" hidden>
+      <h2 class="view-title" data-t="weatherTitle"></h2>
+      <div class="view-sub" data-t="weatherSub"></div>
+      <div class="weather-grid" id="weatherGrid"></div>
+      <div class="disclaimer" data-t="disclaimer" style="margin-top:16px"></div>
+    </div>
+
+    <div id="mapView" hidden>
+      <h2 class="view-title" data-t="mapTitle"></h2>
+      <div class="view-sub" data-t="mapSub"></div>
+      <div class="map-wrap">
+        <svg class="map-svg" viewBox="0 0 320 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <ellipse cx="200" cy="55" rx="58" ry="42" transform="rotate(-10 200 55)"/>
+          <ellipse cx="208" cy="135" rx="30" ry="50" transform="rotate(-8 208 135)"/>
+          <ellipse cx="192" cy="228" rx="42" ry="48" transform="rotate(-5 192 228)"/>
+          <ellipse cx="155" cy="315" rx="58" ry="32" transform="rotate(5 155 315)"/>
+          <ellipse cx="143" cy="372" rx="24" ry="14"/>
+          <ellipse cx="100" cy="402" rx="34" ry="44" transform="rotate(5 100 402)"/>
+          <circle cx="60" cy="520" r="7"/>
+          <line x1="90" y1="460" x2="65" y2="513" stroke-dasharray="3 3"/>
+        </svg>
+        <div class="map-pins" id="mapPins"></div>
+      </div>
+      <div class="map-legend" id="mapLegend"></div>
+    </div>
+
+    <div id="gearView" hidden>
+      <h2 class="view-title" data-t="gearTitle2"></h2>
+      <div class="view-sub" data-t="gearSub"></div>
+      <div class="gear-tabs" id="gearTabs"></div>
+      <div id="gearContent"></div>
+    </div>
+
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="nav-btn active" id="navWizard"><span class="nav-ic" id="icWizard"></span><span data-t="tabWizard"></span></button>
+    <button class="nav-btn" id="navNearby"><span class="nav-ic" id="icNearby"></span><span data-t="tabNearby"></span></button>
+    <button class="nav-btn" id="navWeather"><span class="nav-ic" id="icWeather"></span><span data-t="tabWeather"></span></button>
+    <button class="nav-btn" id="navMap"><span class="nav-ic" id="icMap"></span><span data-t="tabMap"></span></button>
+    <button class="nav-btn" id="navGear"><span class="nav-ic" id="icGear"></span><span data-t="tabGear"></span></button>
+  </div>
+</nav>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+</div>
+
+<script>
+const RESORTS = [
+  {id:"niseko",lat:42.8048,lng:140.6874,nameJa:"ニセコユナイテッド",nameEn:"Niseko United",prefJa:"北海道",prefEn:"Hokkaido",region:"hokkaido",cityJa:"札幌",cityEn:"Sapporo",distKm:100,timeJa:"バスで約2時間",timeEn:"~2h by bus",flight:true,base:255,top:1308,terrain:[30,40,30],liftAdult:6500,liftStudent:5200,english:"high",weather:{tempC:-6,condJa:"パウダー",condEn:"Powder",wind:15,depth:180},descJa:"世界的に有名なパウダースノーの聖地。外国人スタッフ・英語メニューが充実し、海外からの旅行者も安心。",descEn:"World-famous for powder snow. Large international community with English-speaking staff and menus."},
+  {id:"rusutsu",lat:42.7564,lng:140.8988,nameJa:"ルスツリゾート",nameEn:"Rusutsu Resort",prefJa:"北海道",prefEn:"Hokkaido",region:"hokkaido",cityJa:"札幌",cityEn:"Sapporo",distKm:80,timeJa:"バスで約1時間40分",timeEn:"~1h40m by bus",flight:true,base:420,top:994,terrain:[35,40,25],liftAdult:6000,liftStudent:4800,english:"high",weather:{tempC:-4,condJa:"小雪",condEn:"Light snow",wind:10,depth:150},descJa:"広大な3山エリアとツリーランが人気。遊園地も併設し、滑らない家族も楽しめる。",descEn:"Three connected mountains with great tree runs. An on-site amusement park keeps non-skiers entertained too."},
+  {id:"furano",lat:43.3287,lng:142.3706,nameJa:"富良野スキー場",nameEn:"Furano Ski Resort",prefJa:"北海道",prefEn:"Hokkaido",region:"hokkaido",cityJa:"札幌",cityEn:"Sapporo",distKm:115,timeJa:"車で約2時間10分",timeEn:"~2h10m by car",flight:true,base:230,top:1074,terrain:[40,35,25],liftAdult:5700,liftStudent:4500,english:"medium",weather:{tempC:-8,condJa:"快晴",condEn:"Clear",wind:8,depth:140},descJa:"ワールドカップ開催歴のある本格コースと、初心者に優しい緩斜面を両立。",descEn:"Hosted World Cup races, yet still offers gentle, beginner-friendly slopes."},
+  {id:"hakuba",lat:36.6989,lng:137.8203,nameJa:"白馬八方尾根",nameEn:"Hakuba Happo-one",prefJa:"長野県",prefEn:"Nagano",region:"nagano",cityJa:"長野",cityEn:"Nagano",distKm:70,timeJa:"バスで約1時間30分",timeEn:"~1h30m by bus",flight:false,base:760,top:1831,terrain:[25,45,30],liftAdult:7000,liftStudent:5600,english:"high",weather:{tempC:-3,condJa:"曇り",condEn:"Cloudy",wind:12,depth:90},descJa:"1998年長野オリンピック会場。広大なゲレンデと国際的な村の雰囲気が魅力。",descEn:"1998 Nagano Olympics venue. Vast terrain and an international village atmosphere."},
+  {id:"nozawa",lat:36.9196,lng:138.4408,nameJa:"野沢温泉スキー場",nameEn:"Nozawa Onsen",prefJa:"長野県",prefEn:"Nagano",region:"nagano",cityJa:"長野",cityEn:"Nagano",distKm:60,timeJa:"バスで約1時間20分",timeEn:"~1h20m by bus",flight:false,base:566,top:1650,terrain:[35,40,25],liftAdult:6200,liftStudent:4900,english:"medium",weather:{tempC:-2,condJa:"雪",condEn:"Snow",wind:9,depth:110},descJa:"滑った後は無料の外湯めぐり。歴史ある温泉街とゲレンデが一体になった珍しいエリア。",descEn:"Free public hot-spring baths after skiing, inside a historic onsen village right at the slopes."},
+  {id:"shiga",lat:36.7,lng:138.5236,nameJa:"志賀高原スキー場",nameEn:"Shiga Kogen",prefJa:"長野県",prefEn:"Nagano",region:"nagano",cityJa:"長野",cityEn:"Nagano",distKm:40,timeJa:"バスで約1時間",timeEn:"~1h by bus",flight:false,base:1330,top:2307,terrain:[30,35,35],liftAdult:6000,liftStudent:4700,english:"medium",weather:{tempC:-10,condJa:"快晴",condEn:"Clear",wind:14,depth:160},descJa:"共通リフト券で19エリアを周遊できる日本最大級のスキーエリア。標高が高く雪質が安定。",descEn:"Japan's largest linked ski area — 19 zones on one pass. High base elevation keeps snow quality stable."},
+  {id:"myoko",lat:36.8947,lng:138.1875,nameJa:"妙高杉ノ原スキー場",nameEn:"Myoko Suginohara",prefJa:"新潟県",prefEn:"Niigata",region:"niigata",cityJa:"上越妙高",cityEn:"Joetsu-Myoko",distKm:45,timeJa:"バスで約50分",timeEn:"~50m by bus",flight:false,base:500,top:1200,terrain:[30,30,40],liftAdult:5600,liftStudent:null,english:"low",weather:{tempC:-5,condJa:"雪",condEn:"Snow",wind:10,depth:170},descJa:"全長8.5kmの日本最長級ゲレンデが名物。上越妙高駅から新幹線アクセスも良好。",descEn:"Home to one of Japan's longest runs at 8.5km. Good shinkansen access via Joetsu-Myoko station."},
+  {id:"naeba",lat:36.8292,lng:138.7772,nameJa:"苗場スキー場",nameEn:"Naeba Ski Resort",prefJa:"新潟県",prefEn:"Niigata",region:"niigata",cityJa:"東京",cityEn:"Tokyo",distKm:180,timeJa:"直行バスで約2時間",timeEn:"~2h by direct bus",flight:false,base:900,top:1789,terrain:[30,45,25],liftAdult:6300,liftStudent:5000,english:"medium",weather:{tempC:-3,condJa:"曇り",condEn:"Cloudy",wind:13,depth:120},descJa:"東京から直行バス1本で行ける手軽さが強み。フジロック会場としても有名。",descEn:"A single direct bus from Tokyo — famous also as the Fuji Rock Festival site."},
+  {id:"karuizawa",lat:36.3203,lng:138.6314,nameJa:"軽井沢プリンスホテルスキー場",nameEn:"Karuizawa Prince Hotel Ski Resort",prefJa:"長野県",prefEn:"Nagano",region:"nagano",cityJa:"東京",cityEn:"Tokyo",distKm:150,timeJa:"新幹線+シャトルで約1時間10分",timeEn:"~1h10m by shinkansen + shuttle",flight:false,base:1000,top:1155,terrain:[60,30,10],liftAdult:5500,liftStudent:4300,english:"high",weather:{tempC:-1,condJa:"快晴",condEn:"Sunny",wind:6,depth:40},descJa:"東京から最速で日帰りできる初心者向けゲレンデ。高低差が小さく練習に最適。",descEn:"The fastest day-trip from Tokyo. Gentle elevation change makes it ideal for first-timers."},
+  {id:"zao",lat:38.1392,lng:140.5503,nameJa:"蔵王温泉スキー場",nameEn:"Zao Onsen",prefJa:"山形県",prefEn:"Yamagata",region:"tohoku",cityJa:"山形",cityEn:"Yamagata",distKm:18,timeJa:"バスで約40分",timeEn:"~40m by bus",flight:false,base:620,top:1736,terrain:[30,35,35],liftAdult:6000,liftStudent:4700,english:"low",weather:{tempC:-9,condJa:"快晴",condEn:"Clear",wind:20,depth:200},descJa:"樹氷（スノーモンスター）で世界的に有名。滑走後は蔵王温泉の硫黄湯も楽しめる。",descEn:"World-famous for its frost-covered 'snow monster' trees, plus sulfur hot springs after skiing."},
+  {id:"washigatake",lat:35.9333,lng:136.8667,nameJa:"鷲ヶ岳スキー場",nameEn:"Washigatake Ski Resort",prefJa:"岐阜県",prefEn:"Gifu",region:"chubu",cityJa:"名古屋",cityEn:"Nagoya",distKm:90,timeJa:"車で約1時間30分",timeEn:"~1h30m by car",flight:false,base:830,top:1670,terrain:[35,40,25],liftAdult:5200,liftStudent:4000,english:"low",weather:{tempC:-4,condJa:"曇り",condEn:"Cloudy",wind:11,depth:95},descJa:"名古屋から日帰り圏内で人気の岐阜エリア。ファミリー・初心者向けゲレンデが充実。",descEn:"A popular day-trip area from Nagoya. Plenty of family- and beginner-friendly runs."},
+  {id:"okuibuki",lat:35.4833,lng:136.4167,nameJa:"奥伊吹スキー場",nameEn:"Oku-Ibuki Ski Resort",prefJa:"滋賀県",prefEn:"Shiga",region:"kansai",cityJa:"名古屋",cityEn:"Nagoya",distKm:100,timeJa:"車で約1時間40分",timeEn:"~1h40m by car",flight:false,base:600,top:1260,terrain:[30,40,30],liftAdult:5000,liftStudent:3800,english:"low",weather:{tempC:-3,condJa:"雪",condEn:"Snow",wind:9,depth:85},descJa:"関西から最も近い本格ゲレンデのひとつ。大阪・名古屋どちらからもアクセス可能。",descEn:"One of the closest full-scale resorts to the Kansai area, reachable from both Osaka and Nagoya."},
+  {id:"tambara",lat:36.7889,lng:139.1069,nameJa:"たんばらスキーパーク",nameEn:"Tambara Ski Park",prefJa:"群馬県",prefEn:"Gunma",region:"kanto",cityJa:"前橋",cityEn:"Maebashi",distKm:55,timeJa:"車で約1時間20分",timeEn:"~1h20m by car",flight:false,base:1230,top:1620,terrain:[45,35,20],liftAdult:5600,liftStudent:4300,english:"low",weather:{tempC:-6,condJa:"快晴",condEn:"Clear",wind:10,depth:130},descJa:"関東から近く、標高が高いため雪質が安定。初心者コースが広い。",descEn:"Close to the Kanto area with high elevation for stable snow quality. Wide beginner courses."},
+  {id:"marunuma",lat:36.7667,lng:139.3167,nameJa:"丸沼高原スキー場",nameEn:"Marunuma Kogen",prefJa:"群馬県",prefEn:"Gunma",region:"kanto",cityJa:"前橋",cityEn:"Maebashi",distKm:70,timeJa:"車で約1時間40分",timeEn:"~1h40m by car",flight:false,base:1430,top:2000,terrain:[25,40,35],liftAdult:6000,liftStudent:4700,english:"medium",weather:{tempC:-8,condJa:"快晴",condEn:"Clear",wind:13,depth:140},descJa:"関東最高クラスの標高を誇り、シーズン序盤から雪質が良い。上級コースも充実。",descEn:"One of the highest-elevation resorts in Kanto, with good snow early in the season and solid advanced terrain."},
+  {id:"hunter",lat:37.0,lng:139.8333,nameJa:"ハンターマウンテン塩原",nameEn:"Hunter Mountain Shiobara",prefJa:"栃木県",prefEn:"Tochigi",region:"kanto",cityJa:"宇都宮",cityEn:"Utsunomiya",distKm:50,timeJa:"車で約1時間10分",timeEn:"~1h10m by car",flight:false,base:1150,top:1470,terrain:[40,40,20],liftAdult:5500,liftStudent:4200,english:"low",weather:{tempC:-5,condJa:"曇り",condEn:"Cloudy",wind:12,depth:100},descJa:"東北道からのアクセスが良く、首都圏から日帰りしやすい。人工降雪でシーズン初期から滑走可。",descEn:"Easy access from the Tohoku Expressway, a popular day trip from greater Tokyo. Artificial snow keeps it open early season."},
+  {id:"tateyama",lat:36.5756,lng:137.3889,nameJa:"立山山麓スキー場",nameEn:"Tateyama Sanroku Ski Resort",prefJa:"富山県",prefEn:"Toyama",region:"hokuriku",cityJa:"富山",cityEn:"Toyama",distKm:30,timeJa:"車で約50分",timeEn:"~50m by car",flight:false,base:470,top:1330,terrain:[30,35,35],liftAdult:5300,liftStudent:4000,english:"low",weather:{tempC:-4,condJa:"雪",condEn:"Snow",wind:14,depth:190},descJa:"立山連峰の懐に広がる豪雪地帯のゲレンデ。北陸新幹線で富山からもアクセスしやすい。",descEn:"Set beneath the Tateyama mountain range in one of Japan's heaviest snowfall areas. Easy access from Toyama via Hokuriku Shinkansen."},
+  {id:"appi",lat:39.9333,lng:140.9,nameJa:"安比高原スキー場",nameEn:"Appi Kogen",prefJa:"岩手県",prefEn:"Iwate",region:"tohoku",cityJa:"仙台",cityEn:"Sendai",distKm:150,timeJa:"新幹線+バスで約2時間",timeEn:"~2h by shinkansen + bus",flight:false,base:540,top:1304,terrain:[40,35,25],liftAdult:6200,liftStudent:4900,english:"medium",weather:{tempC:-10,condJa:"快晴",condEn:"Clear",wind:9,depth:160},descJa:"東日本最大級のゲレンデ規模とパウダースノーで知られる。外資系ホテルも進出し国際化が進む。",descEn:"One of Eastern Japan's largest resorts, known for powder snow. International hotel chains have moved in as it globalizes."},
+  {id:"inawashiro",lat:37.5833,lng:140.1,nameJa:"猪苗代スキー場",nameEn:"Inawashiro Ski Resort",prefJa:"福島県",prefEn:"Fukushima",region:"tohoku",cityJa:"福島",cityEn:"Fukushima",distKm:35,timeJa:"車で約50分",timeEn:"~50m by car",flight:false,base:514,top:1152,terrain:[40,35,25],liftAdult:5200,liftStudent:4000,english:"low",weather:{tempC:-3,condJa:"曇り",condEn:"Cloudy",wind:11,depth:80},descJa:"猪苗代湖を見下ろす眺望が魅力。東北道・磐越道からアクセスしやすい家族向けゲレンデ。",descEn:"Beautiful views over Lake Inawashiro. Easy access and a family-friendly layout."},
+  {id:"kuju",lat:33.0833,lng:131.25,nameJa:"九重森林公園スキー場",nameEn:"Kuju Forest Park Ski Resort",prefJa:"大分県",prefEn:"Oita",region:"kyushu",cityJa:"大分",cityEn:"Oita",distKm:60,timeJa:"車で約1時間20分",timeEn:"~1h20m by car",flight:false,base:1330,top:1450,terrain:[55,35,10],liftAdult:4000,liftStudent:3000,english:"low",weather:{tempC:-1,condJa:"曇り",condEn:"Cloudy",wind:16,depth:30},descJa:"九州でスキーができる数少ない貴重なゲレンデのひとつ。コンパクトながら初心者には手頃。",descEn:"One of the very few places to ski in Kyushu. Small but approachable for beginners."},
+];
+
+/* Inline SVG icon set — kept self-contained (no external image fetch) so rendering is identical on every OS,
+   unlike native emoji which render differently per platform. */
+const ICONS = {
+  sparkle:'<path d="M12 2l1.6 5.6L19 9l-5.4 1.4L12 16l-1.6-5.6L5 9l5.4-1.4z"/>',
+  pin:'<path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/>',
+  sun:'<circle cx="12" cy="12" r="4.3"/><path d="M12 2.5v3M12 18.5v3M4.4 4.4l2.1 2.1M17.5 17.5l2.1 2.1M2.5 12h3M18.5 12h3M4.4 19.6l2.1-2.1M17.5 6.5l2.1-2.1"/>',
+  cloud:'<path d="M7 18a4.3 4.3 0 1 1 .7-8.5A5.3 5.3 0 0 1 18 11a3.3 3.3 0 0 1-.4 7H7z"/>',
+  snow:'<path d="M12 2.5v19M4.3 7.2l15.4 9.6M19.7 7.2L4.3 16.8M2.5 12h19"/>',
+  map:'<path d="M4 7c6-5 10 3 16-2v12c-6 5-10-3-16 2z"/>',
+  backpack:'<path d="M8 8V6.3a4 4 0 0 1 8 0V8"/><rect x="5" y="8" width="14" height="13" rx="3"/><path d="M9 12.5h6M9 16h6"/>',
+  car:'<path d="M3 13l2-5a2 2 0 0 1 1.9-1.3h10.2A2 2 0 0 1 19 7.7l2 5.3"/><rect x="2" y="13" width="20" height="6" rx="2"/><circle cx="7" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+  bed:'<path d="M3 18v-6.5A2 2 0 0 1 5 9.5h14a2 2 0 0 1 2 2V18"/><path d="M3 15.2h18"/><path d="M7 11V8.3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V11"/>',
+  hotel:'<rect x="4" y="3" width="16" height="18" rx="1.2"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M10 21v-5h4v5"/>',
+  food:'<path d="M4 10a8 5 0 0 0 16 0z"/><path d="M4 10h16"/><path d="M12 10V4.3M9.3 5.3L12 4l2.7 1.3"/>',
+  onsen:'<circle cx="12" cy="17" r="4"/><path d="M8 9.2q2-2 0-4.2M12 9.2q2-2 0-4.2M16 9.2q2-2 0-4.2"/>',
+  jacket:'<path d="M8 4l4 2 4-2 3 3-2 2.6V20a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V9.6L5 7z"/>',
+  goggles:'<ellipse cx="8" cy="12" rx="4" ry="3.1"/><ellipse cx="16" cy="12" rx="4" ry="3.1"/><path d="M3.3 10.4l2 .6M20.7 10.4l-2 .6"/>',
+  helmet:'<path d="M4 15a8 8 0 0 1 16 0z"/><path d="M4 15h16v1.6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>',
+  scarf:'<path d="M4 6c4 2 12 2 16 0M6.3 6.3v12.5a2 2 0 0 0 4 0v-2.7M17.7 6.3v8.6a2 2 0 0 1-4 0v-1.8"/>',
+  gloves:'<path d="M7 11V5.2a2 2 0 0 1 4 0V9M11 9V4.3a2 2 0 0 1 4 0V9M15 9V5.2a2 2 0 0 1 4 0V13a5 5 0 0 1-5 5H9a4 4 0 0 1-4-4v-2.6a2 2 0 0 1 4 0"/>',
+  boots:'<path d="M9 3v9l-5 3a2 2 0 0 0-1 1.7V19a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1c0-2-1-3-3-3h-5V3z"/>',
+  poles:'<path d="M6.3 2.3l3.7 19M17.7 2.3l-3.7 19M4.3 4.3l4-2M19.7 4.3l-4-2M8 13.3l-3 2M16 13.3l3 2"/>',
+  case:'<rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V5.3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V7M4 12h16"/>',
+  refresh:'<path d="M20.5 12a8.5 8.5 0 1 1-2.8-6.3M20.5 4v5h-5"/>',
+  gradCap:'<path d="M2 9l10-4 10 4-10 4z"/><path d="M6 11v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  ski:'<path d="M4.3 18l13.4-13M8.3 18l13.4-13M2 19l4-1M18 6l4-1"/>',
+};
+function icon(name, size){
+  size = size || 18;
+  return `<svg class="ic-svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||""}</svg>`;
+}
+
+/* approximate pin positions in the simplified map illustration (viewBox 320x560) — not real GPS coordinates */
+const MAP_PINS = {
+  niseko:{x:195,y:48}, rusutsu:{x:178,y:63}, furano:{x:212,y:58},
+  zao:{x:212,y:150}, appi:{x:218,y:118}, inawashiro:{x:200,y:168},
+  myoko:{x:197,y:213}, naeba:{x:206,y:208}, hakuba:{x:184,y:226}, nozawa:{x:195,y:219},
+  shiga:{x:190,y:231}, karuizawa:{x:201,y:236}, tambara:{x:196,y:210}, marunuma:{x:199,y:204},
+  hunter:{x:206,y:199}, tateyama:{x:166,y:219},
+  washigatake:{x:171,y:271}, okuibuki:{x:154,y:291},
+  kuju:{x:100,y:400},
+};
+
+const GEAR_CATEGORIES = [
+  {id:"bag", ic:"backpack", ja:"バッグ", en:"Bag", real:true, productJa:"VOLKL RACE BOOT PACK（ブーツ用バッグ）", productEn:"VOLKL RACE BOOT PACK (boot bag)", url:"https://hb.afl.rakuten.co.jp/ichiba/575c1e8f.95c040c9.575c1e90.5e7d0fd7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ftanabesp%2Fcd63643%2F&link_type=picttext&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0dGV4dCIsInNpemUiOiIyNDB4MjQwIiwibmFtIjoxLCJuYW1wIjoicmlnaHQiLCJjb20iOjEsImNvbXAiOiJkb3duIiwicHJpY2UiOjEsImJvciI6MSwiY29sIjoxLCJiYnRuIjoxLCJwcm9kIjowLCJhbXAiOmZhbHNlfQ%3D%3D"},
+  {id:"boots", ic:"boots", ja:"ブーツ", en:"Boots", real:true, productJa:"DALBELLO DRS WC S", productEn:"DALBELLO DRS WC S", url:"https://a.r10.to/hPs2xw"},
+  {id:"skis", ic:"ski", ja:"板", en:"Skis", real:true, productJa:"VOLKL RACETIGER SL 165cm + RMotionT12 ビンディングセット", productEn:"VOLKL RACETIGER SL 165cm + RMotionT12 binding set", url:"https://a.r10.to/hYsRXv"},
+  {id:"poles", ic:"poles", ja:"ストック", en:"Poles", real:true, productJa:"SINANO フリーFAST-α", productEn:"SINANO Free FAST-α", url:"https://a.r10.to/h596M2"},
+  {id:"case", ic:"case", ja:"スキーケース", en:"Ski case", real:true, productJa:"VOLKL SKIBAG JP 170cm", productEn:"VOLKL SKIBAG JP 170cm", url:"https://a.r10.to/hPxmLs"},
+  {id:"wear", ic:"jacket", ja:"ウェア", en:"Outerwear", real:false},
+  {id:"goggles", ic:"goggles", ja:"ゴーグル", en:"Goggles", real:false},
+  {id:"helmet", ic:"helmet", ja:"ヘルメット", en:"Helmet", real:false},
+  {id:"base", ic:"scarf", ja:"アンダーウェア", en:"Base layer", real:false},
+  {id:"gloves", ic:"gloves", ja:"グローブ", en:"Gloves", real:false},
+];
+
+const STRINGS = {
+  ja:{
+    tagline:"ゲレンデ検索・比較アプリ（プロトタイプ）",
+    betaPill:"検証版 β",
+    tabWizard:"おまかせ診断",
+    tabNearby:"近くのスキー場",
+    tabWeather:"今日の天気",
+    tabMap:"地図で探す",
+    tabGear:"装備を探す",
+    searchPlaceholder:"ゲレンデ名・都道府県で検索",
+    chipStudent:"学割あり",
+    chipEnglish:"英語対応",
+    regionAll:"全エリア",
+    regionHokkaido:"北海道",
+    regionNagano:"長野",
+    regionNiigata:"新潟",
+    regionTohoku:"東北",
+    regionChubu:"中部（東海）",
+    regionKansai:"関西",
+    regionKanto:"関東",
+    regionHokuriku:"北陸",
+    regionKyushu:"九州",
+    resultCount:(n)=>`${n}件のゲレンデ`,
+    emptyState:"条件に合うゲレンデが見つかりませんでした。検索条件を変えてみてください。",
+    priceUnit:"大人1日券",
+    studentBadge:"学割あり",
+    nearestFrom:"最寄り都市",
+    flightNote:"✈ 東京からは新千歳空港経由がおすすめ",
+    depthLabel:"積雪",
+    windLabel:"風速",
+    terrainLabel:"コース難易度の内訳",
+    terrainBeginner:"初級",
+    terrainIntermediate:"中級",
+    terrainAdvanced:"上級",
+    liftLabel:"リフト券（大人/学生）",
+    englishLabel:"英語対応レベル",
+    englishHigh:"高い：英語スタッフ・メニューあり",
+    englishMedium:"中程度：一部案内が英語対応",
+    englishLow:"低い：英語対応は限定的",
+    noStudentDiscount:"学生割引なし",
+    placeTitle:"地図で場所を見る",
+    placeDesc:"このゲレンデをGoogleマップで直接開きます。",
+    placeBtn:"Googleマップを開く",
+    lodgingTitle:"近隣の宿泊",
+    lodgingDesc:"楽天トラベルで周辺の宿を検索し、予約は提携サイト側で完了します。",
+    lodgingBtn:"宿泊を探す（楽天トラベルへ）",
+    foodTitle:"近隣の飲食店",
+    foodDesc:"Googleマップでゲレンデ周辺のレストラン・食堂を検索できます。",
+    foodBtn:"周辺のお店を見る（Googleマップへ）",
+    gearTitle:"スキー・スノボグッズ",
+    gearDesc:"レンタル・購入どちらもこのゲレンデ名でECサイト検索できます。",
+    gearBtn:"グッズを探す（楽天市場へ）",
+    disclaimer:"※天気・積雪はOpen-Meteo APIによる実データです（リアルタイム取得・読み込み中は一時的にサンプル値が出ます）。距離・時間・価格・英語対応レベルはまだ検証用のサンプル値です。実運用では公式サイト・楽天トラベル等のAPIから自動取得します。宿泊・飲食・グッズのリンクは提携完了後、正式なアフィリエイトIDに差し替えます。",
+    liveWeatherBadge:"ライブ",
+    close:"閉じる",
+    wizardIntro:"3つだけ答えてください。あとは私がぜんぶ決めます。",
+    qFromBlock:"どの地方から出発しますか？",
+    qFromPref:"都道府県を選んでください",
+    approxNote:"※この地域の近くに登録済みのゲレンデがまだ少なく、参考値として一番近い拠点のおすすめを表示しています。",
+    qTrip:"日帰り？泊まりでもOK？",
+    qLevel:"滑るレベルは？",
+    tripDay:"日帰りがいい",
+    tripStay:"泊まりでもOK",
+    levelBeginner:"初心者",
+    levelMid:"中級",
+    levelAdv:"上級",
+    wizardSubmit:"おすすめを見る",
+    recoEyebrow:"あなたへのおすすめ",
+    recoWhy:(trip,level)=>`${trip}・${level}むけに選びました`,
+    rowAccess:"行き方",
+    rowWeather:"今日の天気",
+    rowPacking:"持ち物リスト",
+    rowStay:"日帰り or 泊まり",
+    stayDayOk:"十分日帰りできます",
+    stayRecommend:"宿泊した方が余裕を持てます",
+    another:"別の提案を見る",
+    seeDetail:"詳しく見る",
+    startOver:"← 最初からやり直す",
+    packBase:"ゴーグル",
+    packBase2:"グローブ",
+    packBase3:"ネックウォーマー",
+    packBase4:"日焼け止め",
+    packCold:"ホッカイロ",
+    packCold2:"インナーダウン",
+    packSnow:"防水スプレー",
+    weatherTitle:"今日の天気",
+    weatherSub:"主要ゲレンデの天気・積雪をまとめてチェック（サンプル値）",
+    mapTitle:"地図で探す",
+    mapSub:"簡略化した日本列島のイラストです。実際の地図データではなく、おおよその位置の目安としてご覧ください。",
+    mapLegend:"ピンをタップすると詳細が見られます",
+    onsenTitle:"帰りの温泉",
+    onsenDesc:"ゲレンデ周辺の日帰り温泉をGoogleマップで検索できます。",
+    onsenBtn:"周辺の温泉を見る（Googleマップへ）",
+    gearTitle2:"装備を探す",
+    gearSub:"カテゴリを選ぶと、楽天市場の検索結果に移動します",
+  },
+  en:{
+    tagline:"Ski resort finder (prototype)",
+    betaPill:"Beta",
+    tabWizard:"Recommend",
+    tabNearby:"Nearby resorts",
+    tabWeather:"Today's weather",
+    tabMap:"Map",
+    tabGear:"Find gear",
+    searchPlaceholder:"Search by resort name or prefecture",
+    chipStudent:"Student discount",
+    chipEnglish:"English support",
+    regionAll:"All regions",
+    regionHokkaido:"Hokkaido",
+    regionNagano:"Nagano",
+    regionNiigata:"Niigata",
+    regionTohoku:"Tohoku",
+    regionChubu:"Chubu (Tokai)",
+    regionKansai:"Kansai",
+    regionKanto:"Kanto",
+    regionHokuriku:"Hokuriku",
+    regionKyushu:"Kyushu",
+    resultCount:(n)=>`${n} resorts`,
+    emptyState:"No resorts match your filters. Try broadening your search.",
+    priceUnit:"adult day pass",
+    studentBadge:"Student discount",
+    nearestFrom:"Nearest city",
+    flightNote:"✈ From Tokyo, flying via New Chitose Airport is recommended",
+    depthLabel:"Snow depth",
+    windLabel:"Wind",
+    terrainLabel:"Terrain difficulty mix",
+    terrainBeginner:"Beginner",
+    terrainIntermediate:"Intermediate",
+    terrainAdvanced:"Advanced",
+    liftLabel:"Lift pass (adult / student)",
+    englishLabel:"English support level",
+    englishHigh:"High — English-speaking staff and menus",
+    englishMedium:"Medium — some signage/info in English",
+    englishLow:"Low — limited English support",
+    noStudentDiscount:"No student discount",
+    placeTitle:"View on map",
+    placeDesc:"Open this resort directly on Google Maps.",
+    placeBtn:"Open Google Maps",
+    lodgingTitle:"Nearby lodging",
+    lodgingDesc:"Search nearby stays on Rakuten Travel; booking is completed on their site.",
+    lodgingBtn:"Find lodging (Rakuten Travel)",
+    foodTitle:"Nearby restaurants",
+    foodDesc:"Browse restaurants and cafes near the resort on Google Maps.",
+    foodBtn:"See nearby spots (Google Maps)",
+    gearTitle:"Gear & equipment",
+    gearDesc:"Search rental or purchase options tagged to this resort.",
+    gearBtn:"Find gear (Rakuten Ichiba)",
+    disclaimer:"Weather and snow depth are live data from the Open-Meteo API (fetched in real time; sample values show briefly while loading). Distance, time, price and English-support level are still illustrative sample data. A production build would pull these from official resort sites and the Rakuten Travel API. Lodging/food/gear links will be swapped for real affiliate IDs once partnerships are set up.",
+    liveWeatherBadge:"LIVE",
+    close:"Close",
+    wizardIntro:"Just answer 3 quick questions. We'll handle the rest.",
+    qFromBlock:"Which region are you starting from?",
+    qFromPref:"Pick your prefecture",
+    approxNote:"We don't have many registered resorts near this area yet — showing the closest recommended hub as a rough reference.",
+    qTrip:"Day trip, or okay to stay overnight?",
+    qLevel:"What's your level?",
+    tripDay:"Day trip only",
+    tripStay:"Overnight is fine",
+    levelBeginner:"Beginner",
+    levelMid:"Intermediate",
+    levelAdv:"Advanced",
+    wizardSubmit:"Show my recommendation",
+    recoEyebrow:"Recommended for you",
+    recoWhy:(trip,level)=>`Picked for a ${trip.toLowerCase()}, ${level.toLowerCase()} rider`,
+    rowAccess:"How to get there",
+    rowWeather:"Today's weather",
+    rowPacking:"What to bring",
+    rowStay:"Day trip or stay",
+    stayDayOk:"Easily doable as a day trip",
+    stayRecommend:"Staying overnight gives you more breathing room",
+    another:"Show another option",
+    seeDetail:"See full details",
+    startOver:"← Start over",
+    packBase:"Goggles",
+    packBase2:"Gloves",
+    packBase3:"Neck warmer",
+    packBase4:"Sunscreen",
+    packCold:"Hand warmers",
+    packCold2:"Thermal layer",
+    packSnow:"Waterproof spray",
+    weatherTitle:"Today's weather",
+    weatherSub:"Weather and snow depth at a glance across major resorts (sample data)",
+    mapTitle:"Find on map",
+    mapSub:"A simplified illustration of Japan, not real map data — use it as a rough location guide only.",
+    mapLegend:"Tap a pin to see details",
+    onsenTitle:"Hot springs on the way home",
+    onsenDesc:"Search day-trip hot springs near the resort on Google Maps.",
+    onsenBtn:"Find nearby onsen (Google Maps)",
+    gearTitle2:"Find gear",
+    gearSub:"Pick a category to search Rakuten Ichiba",
+  }
+};
+
+const state = {lang:"ja", query:"", region:"all", studentOnly:false, englishOnly:false, view:"wizard"};
+const wiz = {block:null, prefIdx:null, trip:null, level:null, lastId:null, shown:[]};
+const terrainColors = ["var(--good)","var(--cold)","var(--accent)"];
+
+function t(key){ return STRINGS[state.lang][key]; }
+
+const REGION_BLOCKS = [
+  {id:"hokkaido", ja:"北海道", en:"Hokkaido"},
+  {id:"tohoku", ja:"東北", en:"Tohoku"},
+  {id:"kanto", ja:"関東", en:"Kanto"},
+  {id:"chubu", ja:"中部", en:"Chubu"},
+  {id:"kinki", ja:"近畿", en:"Kinki"},
+  {id:"chugoku", ja:"中国", en:"Chugoku"},
+  {id:"shikoku", ja:"四国", en:"Shikoku"},
+  {id:"kyushu", ja:"九州・沖縄", en:"Kyushu / Okinawa"},
+];
+
+/* anchorJa must match a cityJa value used in RESORTS for the +100 exact-match score bonus.
+   approx:true = we don't have a resort hub genuinely close to this prefecture yet;
+   the recommendation shown is the nearest registered hub, not a true local option. */
+const PREFECTURES = [
+  {block:"hokkaido", ja:"北海道", en:"Hokkaido", anchorJa:"札幌", anchorEn:"Sapporo", approx:false},
+  {block:"tohoku", ja:"青森県", en:"Aomori", anchorJa:"仙台", anchorEn:"Sendai", approx:true},
+  {block:"tohoku", ja:"岩手県", en:"Iwate", anchorJa:"仙台", anchorEn:"Sendai", approx:false},
+  {block:"tohoku", ja:"宮城県", en:"Miyagi", anchorJa:"仙台", anchorEn:"Sendai", approx:false},
+  {block:"tohoku", ja:"秋田県", en:"Akita", anchorJa:"仙台", anchorEn:"Sendai", approx:true},
+  {block:"tohoku", ja:"山形県", en:"Yamagata", anchorJa:"山形", anchorEn:"Yamagata", approx:false},
+  {block:"tohoku", ja:"福島県", en:"Fukushima", anchorJa:"福島", anchorEn:"Fukushima", approx:false},
+  {block:"kanto", ja:"茨城県", en:"Ibaraki", anchorJa:"東京", anchorEn:"Tokyo", approx:true},
+  {block:"kanto", ja:"栃木県", en:"Tochigi", anchorJa:"宇都宮", anchorEn:"Utsunomiya", approx:false},
+  {block:"kanto", ja:"群馬県", en:"Gunma", anchorJa:"前橋", anchorEn:"Maebashi", approx:false},
+  {block:"kanto", ja:"埼玉県", en:"Saitama", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"kanto", ja:"千葉県", en:"Chiba", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"kanto", ja:"東京都", en:"Tokyo", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"kanto", ja:"神奈川県", en:"Kanagawa", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"chubu", ja:"新潟県（上越エリア）", en:"Niigata (Joetsu area)", anchorJa:"上越妙高", anchorEn:"Joetsu-Myoko", approx:false},
+  {block:"chubu", ja:"新潟県（中越・魚沼エリア）", en:"Niigata (Chuetsu / Uonuma area)", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"chubu", ja:"新潟県（新潟市周辺）", en:"Niigata (Niigata City area)", anchorJa:"上越妙高", anchorEn:"Joetsu-Myoko", approx:true},
+  {block:"chubu", ja:"富山県", en:"Toyama", anchorJa:"富山", anchorEn:"Toyama", approx:false},
+  {block:"chubu", ja:"石川県", en:"Ishikawa", anchorJa:"富山", anchorEn:"Toyama", approx:true},
+  {block:"chubu", ja:"福井県", en:"Fukui", anchorJa:"富山", anchorEn:"Toyama", approx:true},
+  {block:"chubu", ja:"山梨県", en:"Yamanashi", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"chubu", ja:"長野県（東信・軽井沢方面）", en:"Nagano (Tōshin / Karuizawa area)", anchorJa:"東京", anchorEn:"Tokyo", approx:false},
+  {block:"chubu", ja:"長野県（北信・中信・長野市方面）", en:"Nagano (Hokushin / Chūshin / Nagano City area)", anchorJa:"長野", anchorEn:"Nagano", approx:false},
+  {block:"chubu", ja:"岐阜県", en:"Gifu", anchorJa:"名古屋", anchorEn:"Nagoya", approx:false},
+  {block:"chubu", ja:"静岡県", en:"Shizuoka", anchorJa:"東京", anchorEn:"Tokyo", approx:true},
+  {block:"chubu", ja:"愛知県", en:"Aichi", anchorJa:"名古屋", anchorEn:"Nagoya", approx:false},
+  {block:"kinki", ja:"三重県", en:"Mie", anchorJa:"名古屋", anchorEn:"Nagoya", approx:true},
+  {block:"kinki", ja:"滋賀県", en:"Shiga", anchorJa:"名古屋", anchorEn:"Nagoya", approx:false},
+  {block:"kinki", ja:"京都府", en:"Kyoto", anchorJa:"大阪", anchorEn:"Osaka", approx:false},
+  {block:"kinki", ja:"大阪府", en:"Osaka", anchorJa:"大阪", anchorEn:"Osaka", approx:false},
+  {block:"kinki", ja:"兵庫県", en:"Hyogo", anchorJa:"大阪", anchorEn:"Osaka", approx:false},
+  {block:"kinki", ja:"奈良県", en:"Nara", anchorJa:"大阪", anchorEn:"Osaka", approx:false},
+  {block:"kinki", ja:"和歌山県", en:"Wakayama", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"chugoku", ja:"鳥取県", en:"Tottori", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"chugoku", ja:"島根県", en:"Shimane", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"chugoku", ja:"岡山県", en:"Okayama", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"chugoku", ja:"広島県", en:"Hiroshima", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"chugoku", ja:"山口県", en:"Yamaguchi", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"shikoku", ja:"徳島県", en:"Tokushima", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"shikoku", ja:"香川県", en:"Kagawa", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"shikoku", ja:"愛媛県", en:"Ehime", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"shikoku", ja:"高知県", en:"Kochi", anchorJa:"大阪", anchorEn:"Osaka", approx:true},
+  {block:"kyushu", ja:"福岡県", en:"Fukuoka", anchorJa:"大分", anchorEn:"Oita", approx:false},
+  {block:"kyushu", ja:"佐賀県", en:"Saga", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"kyushu", ja:"長崎県", en:"Nagasaki", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"kyushu", ja:"熊本県", en:"Kumamoto", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"kyushu", ja:"大分県", en:"Oita", anchorJa:"大分", anchorEn:"Oita", approx:false},
+  {block:"kyushu", ja:"宮崎県", en:"Miyazaki", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"kyushu", ja:"鹿児島県", en:"Kagoshima", anchorJa:"大分", anchorEn:"Oita", approx:true},
+  {block:"kyushu", ja:"沖縄県", en:"Okinawa", anchorJa:"大分", anchorEn:"Oita", approx:true},
+];
+const TRIP_OPTS = ["tripDay","tripStay"];
+const LEVEL_OPTS = ["levelBeginner","levelMid","levelAdv"];
+
+function buildPills(container, items, groupKey, labelFn){
+  const el = document.getElementById(container);
+  el.innerHTML = items.map((item,i)=>`<button type="button" class="pill" data-group="${groupKey}" data-idx="${i}">${labelFn(item,i)}</button>`).join("");
+  el.querySelectorAll(".pill").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      el.querySelectorAll(".pill").forEach(b=>b.classList.remove("sel"));
+      btn.classList.add("sel");
+      wiz[groupKey] = Number(btn.dataset.idx);
+      updateSubmitState();
+    });
+  });
+}
+
+function buildBlockPills(){
+  const el = document.getElementById("pillBlock");
+  el.innerHTML = REGION_BLOCKS.map(b=>{
+    const label = state.lang==="ja" ? b.ja : b.en;
+    const sel = wiz.block===b.id ? "sel" : "";
+    return `<button type="button" class="pill ${sel}" data-block="${b.id}">${label}</button>`;
+  }).join("");
+  el.querySelectorAll(".pill").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      wiz.block = btn.dataset.block;
+      wiz.prefIdx = null;
+      el.querySelectorAll(".pill").forEach(b=>b.classList.remove("sel"));
+      btn.classList.add("sel");
+      document.getElementById("prefBlockWrap").hidden = false;
+      buildPrefPills();
+      updateSubmitState();
+    });
+  });
+}
+
+function buildPrefPills(){
+  if(!wiz.block) return;
+  const el = document.getElementById("pillPref");
+  const indices = PREFECTURES.map((p,i)=>i).filter(i=>PREFECTURES[i].block===wiz.block);
+  el.innerHTML = indices.map(i=>{
+    const p = PREFECTURES[i];
+    const label = state.lang==="ja" ? p.ja : p.en;
+    const sel = wiz.prefIdx===i ? "sel" : "";
+    return `<button type="button" class="pill ${sel}" data-idx="${i}">${label}</button>`;
+  }).join("");
+  el.querySelectorAll(".pill").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      wiz.prefIdx = Number(btn.dataset.idx);
+      el.querySelectorAll(".pill").forEach(b=>b.classList.remove("sel"));
+      btn.classList.add("sel");
+      updateSubmitState();
+    });
+  });
+}
+
+function updateSubmitState(){
+  document.getElementById("wizardSubmit").disabled = !(wiz.prefIdx!==null && wiz.trip!==null && wiz.level!==null);
+}
+
+function applyStaticText(){
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll("[data-t]").forEach(el=>{
+    const k = el.getAttribute("data-t");
+    if(typeof STRINGS[state.lang][k] === "string") el.textContent = t(k);
+  });
+  document.querySelectorAll("[data-t-placeholder]").forEach(el=>{
+    el.placeholder = t(el.getAttribute("data-t-placeholder"));
+  });
+  document.getElementById("btnJa").classList.toggle("active", state.lang==="ja");
+  document.getElementById("btnEn").classList.toggle("active", state.lang==="en");
+
+  const regionSelect = document.getElementById("regionSelect");
+  const opts = [["all","regionAll"],["hokkaido","regionHokkaido"],["nagano","regionNagano"],["niigata","regionNiigata"],["tohoku","regionTohoku"],["chubu","regionChubu"],["kansai","regionKansai"],["kanto","regionKanto"],["hokuriku","regionHokuriku"],["kyushu","regionKyushu"]];
+  regionSelect.innerHTML = opts.map(([v,k])=>`<option value="${v}" ${state.region===v?"selected":""}>${t(k)}</option>`).join("");
+
+  buildBlockPills();
+  if(wiz.block){ document.getElementById("prefBlockWrap").hidden = false; buildPrefPills(); }
+  buildPills("pillTrip", TRIP_OPTS, "trip", (key)=> t(key));
+  buildPills("pillLevel", LEVEL_OPTS, "level", (key)=> t(key));
+  if(wiz.trip!==null) document.querySelector(`#pillTrip .pill[data-idx="${wiz.trip}"]`)?.classList.add("sel");
+  if(wiz.level!==null) document.querySelector(`#pillLevel .pill[data-idx="${wiz.level}"]`)?.classList.add("sel");
+  updateSubmitState();
+}
+
+function matches(r){
+  const q = state.query.trim().toLowerCase();
+  const name = (state.lang==="ja" ? r.nameJa+r.prefJa : r.nameEn+" "+r.prefEn).toLowerCase();
+  if(q && !name.includes(q)) return false;
+  if(state.region!=="all" && r.region!==state.region) return false;
+  if(state.studentOnly && !r.liftStudent) return false;
+  if(state.englishOnly && r.english==="low") return false;
+  return true;
+}
+
+function wmoToCondition(code){
+  if([71,73,75,77,85,86].includes(code)) return {ja:"雪", en:"Snow"};
+  if(code===0) return {ja:"快晴", en:"Clear"};
+  if([1,2].includes(code)) return {ja:"晴れ", en:"Sunny"};
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return {ja:"雨", en:"Rain"};
+  if([95,96,99].includes(code)) return {ja:"雷雨", en:"Thunderstorm"};
+  return {ja:"曇り", en:"Cloudy"};
+}
+
+async function fetchLiveWeather(r){
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lng}&current=temperature_2m,weather_code,wind_speed_10m,snow_depth&timezone=Asia%2FTokyo`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("weather http " + res.status);
+    const data = await res.json();
+    const cond = wmoToCondition(data.current.weather_code);
+    r.weather = {
+      tempC: Math.round(data.current.temperature_2m),
+      condJa: cond.ja,
+      condEn: cond.en,
+      wind: Math.round(data.current.wind_speed_10m),
+      depth: Math.round((data.current.snow_depth || 0) * 100),
+    };
+    r.liveWeather = true;
+  }catch(err){
+    console.warn("live weather fetch failed for", r.id, err);
+  }
+}
+
+async function loadAllLiveWeather(){
+  await Promise.all(RESORTS.filter(r=>r.lat).map(fetchLiveWeather));
+  render();
+}
+
+function weatherIcon(condJa){
+  if(condJa.includes("雪")||condJa.includes("Snow")||condJa.includes("パウダー")||condJa.includes("Powder")) return icon("snow",18);
+  if(condJa.includes("雨")||condJa.includes("Rain")||condJa.includes("雷")||condJa.includes("Thunderstorm")) return icon("cloud",18);
+  if(condJa.includes("曇")||condJa.includes("Cloud")) return icon("cloud",18);
+  return icon("sun",18);
+}
+
+function renderGrid(){
+  const list = RESORTS.filter(matches).slice().sort((a,b)=>a.distKm-b.distKm);
+  document.getElementById("resultCount").textContent = t("resultCount")(list.length);
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("emptyState");
+  if(list.length===0){ grid.innerHTML=""; empty.hidden=false; empty.textContent=t("emptyState"); return; }
+  empty.hidden = true;
+  grid.innerHTML = list.map(r=>{
+    const name = state.lang==="ja" ? r.nameJa : r.nameEn;
+    const pref = state.lang==="ja" ? r.prefJa : r.prefEn;
+    const city = state.lang==="ja" ? r.cityJa : r.cityEn;
+    const time = state.lang==="ja" ? r.timeJa : r.timeEn;
+    return `
+    <button class="card" data-id="${r.id}">
+      <div class="card-top">
+        <div><h3>${name}</h3><div class="region-tag">${pref}</div></div>
+        <div class="weather-chip">${weatherIcon(r.weather.condJa)} <span class="num">${r.weather.tempC}°C</span></div>
+      </div>
+      <div class="meta-row">
+        <span>${t("nearestFrom")}: ${city} <span class="num">${r.distKm}km</span></span>
+        <span class="dot">・</span><span>${time}</span>
+      </div>
+      <div class="price-row">
+        <div class="price">¥<span class="num">${r.liftAdult.toLocaleString()}</span> <span class="unit">${t("priceUnit")}</span></div>
+        ${r.liftStudent ? `<span class="badge student">${t("studentBadge")}</span>` : ""}
+      </div>
+    </button>`;
+  }).join("");
+}
+
+function renderWeatherTab(){
+  const list = RESORTS.slice().sort((a,b)=>a.distKm-b.distKm);
+  const grid = document.getElementById("weatherGrid");
+  grid.innerHTML = list.map(r=>{
+    const name = state.lang==="ja" ? r.nameJa : r.nameEn;
+    const pref = state.lang==="ja" ? r.prefJa : r.prefEn;
+    const cond = state.lang==="ja" ? r.weather.condJa : r.weather.condEn;
+    return `
+    <button class="weather-card" data-id="${r.id}">
+      <div class="weather-ic">${weatherIcon(r.weather.condJa)}</div>
+      <div class="weather-main">
+        <h3>${name} ${r.liveWeather ? `<span class="live-badge">${t("liveWeatherBadge")}</span>` : ""}</h3>
+        <div class="wsub">${pref} ・ ${cond} ・ ${t("depthLabel")} <span class="num">${r.weather.depth}cm</span> ・ ${t("windLabel")} <span class="num">${r.weather.wind}km/h</span></div>
+      </div>
+      <div class="weather-temp"><span class="num">${r.weather.tempC}°</span><div class="wd">C</div></div>
+    </button>`;
+  }).join("");
+  grid.querySelectorAll(".weather-card").forEach(btn=>{
+    btn.addEventListener("click", ()=>openDetail(btn.dataset.id));
+  });
+}
+
+function renderMapTab(){
+  const pins = document.getElementById("mapPins");
+  pins.innerHTML = RESORTS.filter(r=>MAP_PINS[r.id]).map(r=>{
+    const p = MAP_PINS[r.id];
+    const name = state.lang==="ja" ? r.nameJa : r.nameEn;
+    return `<button class="map-pin" style="left:${(p.x/320*100).toFixed(1)}%;top:${(p.y/560*100).toFixed(1)}%" data-id="${r.id}" aria-label="${name}" title="${name}"><span class="pin-dot"></span></button>`;
+  }).join("");
+  pins.querySelectorAll(".map-pin").forEach(btn=>{
+    btn.addEventListener("click", ()=>openDetail(btn.dataset.id));
+  });
+  document.getElementById("mapLegend").textContent = t("mapLegend");
+}
+
+const gearState = {selected: GEAR_CATEGORIES[0].id};
+
+function renderGearTab(){
+  const tabs = document.getElementById("gearTabs");
+  tabs.innerHTML = GEAR_CATEGORIES.map(g=>{
+    const label = state.lang==="ja" ? g.ja : g.en;
+    const sel = g.id===gearState.selected ? "sel" : "";
+    const dot = g.real ? "" : `<span class="dot-missing" title="${state.lang==="ja"?"準備中":"coming soon"}"></span>`;
+    return `<button type="button" class="gear-tab-btn ${sel}" data-id="${g.id}">${icon(g.ic,16)} ${label} ${dot}</button>`;
+  }).join("");
+  tabs.querySelectorAll(".gear-tab-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ gearState.selected = btn.dataset.id; renderGearTab(); });
+  });
+
+  const g = GEAR_CATEGORIES.find(x=>x.id===gearState.selected);
+  const content = document.getElementById("gearContent");
+  if(g.real){
+    const name = state.lang==="ja" ? g.productJa : g.productEn;
+    content.innerHTML = `
+      <div class="gear-product-card">
+        <div class="gear-product-ic">${icon(g.ic,40)}</div>
+        <div class="gear-product-tag">${state.lang==="ja"?"実在のアフィリエイト商品":"Live affiliate product"}</div>
+        <div class="gear-product-name">${name}</div>
+        <a class="gear-product-btn" href="${g.url}" target="_blank" rel="noopener">${state.lang==="ja"?"楽天市場で見る":"View on Rakuten"}</a>
+      </div>`;
+  } else {
+    content.innerHTML = `
+      <div class="gear-empty-card">${state.lang==="ja"?"このカテゴリはまだアフィリエイトリンク未登録です。楽天で商品ページを開いて「リンクを作成」→共有してもらえれば、ここに反映します。":"No affiliate link registered for this category yet. Generate one on Rakuten and share it to get it added here."}</div>`;
+  }
+}
+
+function openDetail(id){
+  const r = RESORTS.find(x=>x.id===id);
+  if(!r) return;
+  const name = state.lang==="ja" ? r.nameJa : r.nameEn;
+  const pref = state.lang==="ja" ? r.prefJa : r.prefEn;
+  const city = state.lang==="ja" ? r.cityJa : r.cityEn;
+  const time = state.lang==="ja" ? r.timeJa : r.timeEn;
+  const desc = state.lang==="ja" ? r.descJa : r.descEn;
+  const cond = state.lang==="ja" ? r.weather.condJa : r.weather.condEn;
+  const englishText = r.english==="high" ? t("englishHigh") : r.english==="medium" ? t("englishMedium") : t("englishLow");
+  const terrainLabels = [t("terrainBeginner"), t("terrainIntermediate"), t("terrainAdvanced")];
+  const lodgingQuery = encodeURIComponent((state.lang==="ja"?r.nameJa:r.nameEn) + " " + (state.lang==="ja"?"周辺 宿泊":"area hotels"));
+  const foodQuery = encodeURIComponent((state.lang==="ja"?r.nameJa:r.nameEn) + " " + (state.lang==="ja"?"周辺 レストラン":"area restaurants"));
+  const gearQuery = encodeURIComponent((state.lang==="ja"?r.nameJa:r.nameEn) + " " + (state.lang==="ja"?"スキー グッズ":"ski gear"));
+  const onsenQuery = encodeURIComponent((state.lang==="ja"?r.nameJa:r.nameEn) + " " + (state.lang==="ja"?"周辺 日帰り温泉":"area day-trip onsen"));
+  const placeQuery = encodeURIComponent(state.lang==="ja"?r.nameJa:r.nameEn);
+
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <div class="sheet-head">
+      <div>
+        <h2>${name}</h2>
+        <div class="sheet-sub">${pref} ・ ${t("nearestFrom")}: ${city} <span class="num">${r.distKm}km</span> ・ ${time}${r.flight?`<br>${t("flightNote")}`:""}</div>
+      </div>
+      <button class="close-btn" id="closeBtn" aria-label="${t('close')}">✕</button>
+    </div>
+    <p>${desc}</p>
+    <div class="info-cards">
+      <div class="info-card"><div class="big num">${r.base}–${r.top}m</div><div class="label">${state.lang==="ja"?"標高（麓〜山頂）":"Elevation (base–top)"}</div></div>
+      <div class="info-card"><div class="big">${weatherIcon(r.weather.condJa)} <span class="num">${r.weather.tempC}°C</span></div><div class="label">${cond} ・ ${t("windLabel")} <span class="num">${r.weather.wind}km/h</span></div></div>
+      <div class="info-card"><div class="big num">${r.weather.depth}cm</div><div class="label">${t("depthLabel")}</div></div>
+      <div class="info-card"><div class="big num">¥${r.liftAdult.toLocaleString()} / ${r.liftStudent?"¥"+r.liftStudent.toLocaleString():t("noStudentDiscount")}</div><div class="label">${t("liftLabel")}</div></div>
+    </div>
+    <div class="section-label">${t("terrainLabel")}</div>
+    <div class="terrain-bar">${r.terrain.map((p,i)=>`<div style="width:${p}%;background:${terrainColors[i]}"></div>`).join("")}</div>
+    <div class="terrain-legend">${r.terrain.map((p,i)=>`<span><span class="swatch" style="background:${terrainColors[i]}"></span>${terrainLabels[i]} <span class="num">${p}%</span></span>`).join("")}</div>
+    <div class="section-label">${t("englishLabel")}</div>
+    <p style="margin-top:0;margin-bottom:20px;font-size:13.5px;color:var(--text-muted);">${englishText}</p>
+    <div class="section-label">${state.lang==="ja"?"周辺サービスへ送客":"Connect to nearby services"}</div>
+    <div class="cta-grid">
+      <div class="cta-card"><div class="cta-title">${icon("pin",16)} ${t("placeTitle")}</div><div class="cta-desc">${t("placeDesc")}</div><a class="cta-btn" href="https://www.google.com/maps/search/?api=1&query=${placeQuery}" target="_blank" rel="noopener">${t("placeBtn")}</a></div>
+      <div class="cta-card"><div class="cta-title">${icon("hotel",16)} ${t("lodgingTitle")}</div><div class="cta-desc">${t("lodgingDesc")}</div><a class="cta-btn" href="https://travel.rakuten.co.jp/dosearch/?f_keyword=${lodgingQuery}" target="_blank" rel="noopener">${t("lodgingBtn")}</a></div>
+      <div class="cta-card"><div class="cta-title">${icon("food",16)} ${t("foodTitle")}</div><div class="cta-desc">${t("foodDesc")}</div><a class="cta-btn" href="https://www.google.com/maps/search/${foodQuery}" target="_blank" rel="noopener">${t("foodBtn")}</a></div>
+      <div class="cta-card"><div class="cta-title">${icon("ski",16)} ${t("gearTitle")}</div><div class="cta-desc">${t("gearDesc")}</div><a class="cta-btn" href="https://search.rakuten.co.jp/search/mall/${gearQuery}/" target="_blank" rel="noopener">${t("gearBtn")}</a></div>
+      <div class="cta-card"><div class="cta-title">${icon("onsen",16)} ${t("onsenTitle")}</div><div class="cta-desc">${t("onsenDesc")}</div><a class="cta-btn" href="https://www.google.com/maps/search/${onsenQuery}" target="_blank" rel="noopener">${t("onsenBtn")}</a></div>
+    </div>
+    <div class="disclaimer">${t("disclaimer")}</div>
+  `;
+  document.getElementById("overlay").hidden = false;
+  document.getElementById("closeBtn").addEventListener("click", closeDetail);
+  sheet.scrollTop = 0;
+}
+function closeDetail(){ document.getElementById("overlay").hidden = true; }
+
+function packingList(r){
+  const items = [t("packBase"), t("packBase2"), t("packBase3"), t("packBase4")];
+  if(r.weather.tempC <= -5){ items.push(t("packCold")); items.push(t("packCold2")); }
+  if(r.weather.condJa.includes("雪") || r.weather.condJa.includes("パウダー")){ items.push(t("packSnow")); }
+  return items;
+}
+
+function scoreResort(r, fromCityJa, levelIdx){
+  let score = 0;
+  if(r.cityJa === fromCityJa) score += 100;
+  score -= r.distKm * 0.2;
+  score += r.terrain[levelIdx] * 0.6;
+  return score;
+}
+
+function computeRanking(){
+  const pref = PREFECTURES[wiz.prefIdx];
+  return RESORTS.map(r=>({r, s:scoreResort(r, pref.anchorJa, wiz.level)})).sort((a,b)=>b.s-a.s).map(x=>x.r);
+}
+
+function renderRecommendation(){
+  const pref = PREFECTURES[wiz.prefIdx];
+  const ranked = computeRanking();
+  const notYetShown = ranked.find(r=>!wiz.shown.includes(r.id)) || ranked[0];
+  wiz.lastId = notYetShown.id;
+  wiz.shown.push(notYetShown.id);
+  if(wiz.shown.length > RESORTS.length) wiz.shown = [notYetShown.id];
+
+  const r = notYetShown;
+  const name = state.lang==="ja" ? r.nameJa : r.nameEn;
+  const city = state.lang==="ja" ? r.cityJa : r.cityEn;
+  const prefName = state.lang==="ja" ? pref.ja : pref.en;
+  const anchorName = state.lang==="ja" ? pref.anchorJa : pref.anchorEn;
+  const time = state.lang==="ja" ? r.timeJa : r.timeEn;
+  const cond = state.lang==="ja" ? r.weather.condJa : r.weather.condEn;
+  const tripLabel = t(TRIP_OPTS[wiz.trip]);
+  const levelLabel = t(LEVEL_OPTS[wiz.level]);
+  const isDayTrip = wiz.trip===0;
+  const longTrip = r.distKm >= 100;
+  const stayVerdict = (isDayTrip && !longTrip) ? t("stayDayOk") : (longTrip ? t("stayRecommend") : t("stayDayOk"));
+  const packing = packingList(r);
+  const accessLine = anchorName===city
+    ? `${prefName} → ${name}・${time}`
+    : `${prefName}（${state.lang==="ja"?"最寄りの拠点":"nearest hub"}: ${anchorName}）→ ${name}・${time}`;
+
+  const box = document.getElementById("wizardResult");
+  box.hidden = false;
+  box.innerHTML = `
+    <div class="reco-card">
+      <div class="reco-eyebrow">${t("recoEyebrow")}</div>
+      <h2>${name}</h2>
+      <div class="reco-sub">${t("recoWhy")(tripLabel, levelLabel)}</div>
+      ${pref.approx ? `<div class="reco-approx-note">${t("approxNote")}</div>` : ""}
+      <div class="reco-rows">
+        <div class="reco-row"><div class="ic">${icon("car",20)}</div><div><div class="rt">${t("rowAccess")}</div><div class="rv">${accessLine}${r.flight?`<br><span style="font-size:11.5px;color:var(--text-muted)">${t("flightNote")}</span>`:""}</div></div></div>
+        <div class="reco-row"><div class="ic">${weatherIcon(r.weather.condJa)}</div><div><div class="rt">${t("rowWeather")}</div><div class="rv"><span class="num">${r.weather.tempC}°C</span>・${cond}・${t("depthLabel")} <span class="num">${r.weather.depth}cm</span></div></div></div>
+        <div class="reco-row"><div class="ic">${icon("bed",20)}</div><div><div class="rt">${t("rowStay")}</div><div class="rv">${stayVerdict}</div></div></div>
+        <div class="reco-row"><div class="ic">${icon("backpack",20)}</div><div style="flex:1"><div class="rt">${t("rowPacking")}</div><div class="packing-list">${packing.map(p=>`<span class="packing-item">${p}</span>`).join("")}</div></div></div>
+      </div>
+      <div class="reco-actions">
+        <button class="reco-secondary-btn" id="anotherBtn">${icon("refresh",15)} ${t("another")}</button>
+        <button class="reco-detail-btn" id="seeDetailBtn">${t("seeDetail")}</button>
+      </div>
+    </div>
+    <button class="reco-secondary-btn" id="startOverBtn" style="width:100%">${t("startOver")}</button>
+  `;
+  document.getElementById("anotherBtn").addEventListener("click", renderRecommendation);
+  document.getElementById("seeDetailBtn").addEventListener("click", ()=>openDetail(r.id));
+  document.getElementById("startOverBtn").addEventListener("click", resetWizard);
+  document.getElementById("wizardQuiz").hidden = true;
+  box.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function resetWizard(){
+  wiz.block=null; wiz.prefIdx=null; wiz.trip=null; wiz.level=null; wiz.lastId=null; wiz.shown=[];
+  document.getElementById("wizardResult").hidden = true;
+  document.getElementById("wizardResult").innerHTML = "";
+  document.getElementById("prefBlockWrap").hidden = true;
+  document.getElementById("wizardQuiz").hidden = false;
+  applyStaticText();
+}
+
+function setView(view){
+  state.view = view;
+  document.getElementById("navWizard").classList.toggle("active", view==="wizard");
+  document.getElementById("navNearby").classList.toggle("active", view==="nearby");
+  document.getElementById("navWeather").classList.toggle("active", view==="weather");
+  document.getElementById("navMap").classList.toggle("active", view==="map");
+  document.getElementById("navGear").classList.toggle("active", view==="gear");
+  document.getElementById("wizardView").hidden = view!=="wizard";
+  document.getElementById("nearbyView").hidden = view!=="nearby";
+  document.getElementById("weatherView").hidden = view!=="weather";
+  document.getElementById("mapView").hidden = view!=="map";
+  document.getElementById("gearView").hidden = view!=="gear";
+  document.getElementById("searchRow").hidden = view!=="nearby";
+  if(view==="nearby") renderGrid();
+  if(view==="weather") renderWeatherTab();
+  if(view==="map") renderMapTab();
+  if(view==="gear") renderGearTab();
+}
+
+function render(){
+  applyStaticText();
+  if(state.view==="nearby") renderGrid();
+  if(state.view==="weather") renderWeatherTab();
+  if(state.view==="map") renderMapTab();
+  if(state.view==="gear") renderGearTab();
+  if(state.view==="wizard" && !document.getElementById("wizardResult").hidden && wiz.lastId){
+    const idx = wiz.shown.indexOf(wiz.lastId);
+    if(idx>-1) wiz.shown.splice(idx,1);
+    renderRecommendation();
+  }
+}
+
+document.getElementById("btnJa").addEventListener("click", ()=>{state.lang="ja"; render();});
+document.getElementById("btnEn").addEventListener("click", ()=>{state.lang="en"; render();});
+document.getElementById("navWizard").addEventListener("click", ()=>setView("wizard"));
+document.getElementById("navNearby").addEventListener("click", ()=>setView("nearby"));
+document.getElementById("navWeather").addEventListener("click", ()=>setView("weather"));
+document.getElementById("navMap").addEventListener("click", ()=>setView("map"));
+document.getElementById("navGear").addEventListener("click", ()=>setView("gear"));
+document.getElementById("wizardSubmit").addEventListener("click", renderRecommendation);
+document.getElementById("searchInput").addEventListener("input", (e)=>{state.query=e.target.value; renderGrid();});
+document.getElementById("regionSelect").addEventListener("change", (e)=>{state.region=e.target.value; renderGrid();});
+document.getElementById("chipStudent").addEventListener("click", ()=>{
+  state.studentOnly = !state.studentOnly;
+  document.getElementById("chipStudent").classList.toggle("on", state.studentOnly);
+  renderGrid();
+});
+document.getElementById("chipEnglish").addEventListener("click", ()=>{
+  state.englishOnly = !state.englishOnly;
+  document.getElementById("chipEnglish").classList.toggle("on", state.englishOnly);
+  renderGrid();
+});
+document.getElementById("grid").addEventListener("click", (e)=>{
+  const card = e.target.closest(".card");
+  if(card) openDetail(card.dataset.id);
+});
+document.getElementById("overlay").addEventListener("click", (e)=>{ if(e.target.id==="overlay") closeDetail(); });
+document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeDetail(); });
+
+document.getElementById("icWizard").innerHTML = icon("sparkle", 20);
+document.getElementById("icNearby").innerHTML = icon("pin", 20);
+document.getElementById("icWeather").innerHTML = icon("sun", 20);
+document.getElementById("icMap").innerHTML = icon("map", 20);
+document.getElementById("icGear").innerHTML = icon("backpack", 20);
+
+applyStaticText();
+setView("wizard");
+loadAllLiveWeather();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(err=>console.warn("SW registration failed", err));
+  });
+}
+</script>
+
+</body></html>

@@ -1,0 +1,15 @@
+{
+  "name": "YukiNav - ゲレンデ診断アプリ",
+  "short_name": "YukiNav",
+  "description": "スキー・スノボのゲレンデ選びを3問で診断。天気・持ち物・行き方までまとめて提案します。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1F4",
+  "theme_color": "#E2792B",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
